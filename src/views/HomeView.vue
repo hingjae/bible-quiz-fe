@@ -22,7 +22,6 @@ const startQuiz = (): void => {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #f7f0e8, #e8f0f7);
   text-align: center;
 }
 
