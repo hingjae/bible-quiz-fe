@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Notify Slack of build start
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"🚀 *Deployment started* for *jesuslovesquiz.com*..."}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -45,3 +51,22 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.DISTRIBUTION_ID }} \
             --paths "/*"
+
+      - name: Get current version
+        id: get_version
+        run: |
+          echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
+      - name: Notify Slack of successful deployment
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"✅ Deployed *v${{ steps.get_version.outputs.VERSION }}* to *jesuslovesquiz.com* 🚀"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack of deployment failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"❌ Deployment failed for *jesuslovesquiz.com*"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
