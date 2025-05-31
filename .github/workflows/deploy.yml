@@ -34,7 +34,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: "dist"
       - name: Invalidate CloudFront cache
-        uses: aws-actions/aws-cli@v2
+        uses: aws-actions/aws-cli@v1
         with:
           args: cloudfront create-invalidation --distribution-id ${{ secrets.DISTRIBUTION_ID }} --paths "/*"
         env:
