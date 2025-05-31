@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Bible Quest</h1>
+    <h1>Bible Quiz</h1>
     <button @click="startQuiz">Start Quiz</button>
   </div>
 </template>

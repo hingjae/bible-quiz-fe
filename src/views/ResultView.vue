@@ -1,6 +1,6 @@
 <template>
   <div class="result-container">
-    <h1>Bible Quest - Result</h1>
+    <h1>Bible Quiz - Result</h1>
     <p>
       👏 당신의 점수는 <strong>{{ score }}</strong> / {{ total }} 입니다.
     </p>

@@ -1,6 +1,6 @@
 <template>
   <div class="topic-container">
-    <h1>Bible Quest - 주제 선택</h1>
+    <h1>Bible Quiz - 주제 선택</h1>
     <p class="description">원하는 주제를 선택하면 퀴즈가 시작됩니다.</p>
 
     <div class="topic-grid">
