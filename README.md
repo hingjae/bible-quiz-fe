@@ -36,3 +36,7 @@ Deployment to Amazon S3 is handled automatically via GitHub Actions when changes
 - TypeScript
 - GitHub Actions
 - Amazon S3
+
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE).
