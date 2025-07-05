@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "./axios";
 
 export interface Topic {
   id: number;
@@ -7,7 +7,7 @@ export interface Topic {
 
 export const fetchTopics = async () => {
   try {
-    const response = await axios.get("/api/topics");
+    const response = await apiClient.get("/api/topics");
 
     return response.data.data.topics;
   } catch (error) {

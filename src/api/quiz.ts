@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "./axios";
 
 export interface Quiz {
   id: number;
@@ -12,7 +12,7 @@ export interface Quiz {
 
 export const fetchQuizzes = async (topicId: number): Promise<Quiz[]> => {
   try {
-    const response = await axios.get("/api/quizzes", {
+    const response = await apiClient.get("/api/quizzes", {
       params: { topicId },
     });
     return response.data.data.quizzes;
