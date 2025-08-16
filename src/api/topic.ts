@@ -3,6 +3,7 @@ import apiClient from "./axios";
 export interface Topic {
   id: number;
   title: string;
+  bookTitle: string;
 }
 
 export const fetchTopics = async () => {
