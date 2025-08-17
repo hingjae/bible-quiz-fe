@@ -5,7 +5,7 @@
 
     <div class="topic-grid">
       <button v-for="topic in topics" :key="topic.id" class="topic-btn" @click="goToQuiz(topic.id)">
-        {{ topic.title || topic.bookTitle }}
+        {{ topic.question || topic.bookTitle }}
       </button>
     </div>
   </div>

@@ -2,7 +2,7 @@ import apiClient from "./axios";
 
 export interface Topic {
   id: number;
-  title: string;
+  question: string;
   bookTitle: string;
 }
 
