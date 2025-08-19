@@ -4,6 +4,7 @@ export interface Topic {
   id: number;
   question: string;
   bookTitle: string;
+  testament: "OLD" | "NEW";
 }
 
 export const fetchTopics = async () => {

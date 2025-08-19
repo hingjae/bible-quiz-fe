@@ -1,19 +1,41 @@
 <template>
   <div class="topic-container">
-    <h1>Bible Quiz - 주제 선택</h1>
+    <h1>Bible Quiz</h1>
     <p class="description">원하는 주제를 선택하면 퀴즈가 시작됩니다.</p>
 
-    <div class="topic-grid">
-      <button v-for="topic in topics" :key="topic.id" class="topic-btn" @click="goToQuiz(topic.id)">
-        {{ topic.question || topic.bookTitle }}
-      </button>
-    </div>
+    <section v-if="oldTestamentTopics.length">
+      <h2 class="section-title">📖 구약</h2>
+      <div class="topic-grid">
+        <button
+          v-for="topic in oldTestamentTopics"
+          :key="topic.id"
+          class="topic-btn old"
+          @click="goToQuiz(topic.id)"
+        >
+          {{ topic.question || topic.bookTitle }}
+        </button>
+      </div>
+    </section>
+
+    <section v-if="newTestamentTopics.length">
+      <h2 class="section-title">✝️ 신약</h2>
+      <div class="topic-grid">
+        <button
+          v-for="topic in newTestamentTopics"
+          :key="topic.id"
+          class="topic-btn new"
+          @click="goToQuiz(topic.id)"
+        >
+          {{ topic.question || topic.bookTitle }}
+        </button>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import { fetchTopics, type Topic } from "@/api/topic";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -23,9 +45,12 @@ onMounted(async () => {
   try {
     topics.value = await fetchTopics();
   } catch (error) {
-    throw error;
+    console.error(error);
   }
 });
+
+const oldTestamentTopics = computed(() => topics.value.filter((t) => t.testament === "OLD"));
+const newTestamentTopics = computed(() => topics.value.filter((t) => t.testament === "NEW"));
 
 const goToQuiz = (topicId: number) => {
   router.push({ name: "quiz", query: { topicId } });
@@ -38,6 +63,13 @@ const goToQuiz = (topicId: number) => {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+
+  /* 중앙 정렬 추가 */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 세로 중앙 */
+  align-items: center; /* 가로 중앙 */
 }
 
 h1 {
@@ -51,13 +83,21 @@ h1 {
 .description {
   font-size: 1rem;
   color: #555;
-  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4b3f72;
+  margin: 1.5rem 0 1rem;
 }
 
 .topic-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
+  display: flex; /* flex 레이아웃 */
+  justify-content: center; /* 가로 중앙 정렬 */
+  gap: 1rem; /* 버튼 간격 */
+  flex-wrap: wrap; /* 화면이 좁아지면 자동 줄바꿈 */
+  margin-bottom: 2rem;
 }
 
 .topic-btn {
@@ -72,6 +112,20 @@ h1 {
 }
 
 .topic-btn:hover {
+  background-color: #5a3edf;
+}
+
+.topic-btn.old {
+  background-color: #2d9d78; /* 초록 계열 (구약) */
+}
+.topic-btn.old:hover {
+  background-color: #238067;
+}
+
+.topic-btn.new {
+  background-color: #6b4eff; /* 보라 계열 (신약) */
+}
+.topic-btn.new:hover {
   background-color: #5a3edf;
 }
 </style>
