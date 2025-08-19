@@ -39,20 +39,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { fetchQuizzes, type Quiz } from "@/api/quiz";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
+import { useQuizStore } from "@/stores/quiz";
 
 const quizzes = ref<Quiz[]>([]);
 const answers = ref<{ [key: number]: string }>({});
 const isSubmitted = ref(false);
 const correctCount = ref(0);
-const route = useRoute();
-const topicId = computed(() => Number(route.query.topicId));
+
+const router = useRouter();
+const quizStore = useQuizStore();
 
 onMounted(async () => {
+  quizStore.hydrateFromSession();
+
+  if (quizStore.topicId == null) {
+    router.replace({ name: "topics" });
+    return;
+  }
+
   try {
-    const fetchedQuizzes = await fetchQuizzes(topicId.value);
+    const fetchedQuizzes = await fetchQuizzes(quizStore.topicId);
     quizzes.value = fetchedQuizzes.map((quiz) => ({
       ...quiz,
       options: quiz.options
@@ -70,6 +79,7 @@ const getOptionLabel = (index: number): string => {
 };
 
 const selectAnswer = (quizId: number, option: string) => {
+  if (isSubmitted.value) return;
   answers.value[quizId] = option;
 };
 
@@ -84,11 +94,8 @@ const getOptionClass = (quiz: Quiz, optionText: string) => {
   if (!isSubmitted.value) {
     return selected === optionText ? "selected" : "";
   } else {
-    if (optionText === correct) {
-      return "correct";
-    } else if (selected === optionText) {
-      return "wrong";
-    }
+    if (optionText === correct) return "correct";
+    if (selected === optionText) return "wrong";
     return "";
   }
 };
@@ -102,8 +109,6 @@ const submitQuiz = () => {
   });
   isSubmitted.value = true;
 };
-
-const router = useRouter();
 
 const goToResult = () => {
   router.push({

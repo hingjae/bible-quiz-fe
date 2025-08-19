@@ -35,10 +35,12 @@
 
 <script setup lang="ts">
 import { fetchTopics, type Topic } from "@/api/topic";
+import { useQuizStore } from "@/stores/quiz";
 import { onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+const quizStore = useQuizStore();
 const topics = ref<Topic[]>([]);
 
 onMounted(async () => {
@@ -53,7 +55,8 @@ const oldTestamentTopics = computed(() => topics.value.filter((t) => t.testament
 const newTestamentTopics = computed(() => topics.value.filter((t) => t.testament === "NEW"));
 
 const goToQuiz = (topicId: number) => {
-  router.push({ name: "quiz", query: { topicId } });
+  quizStore.setTopic(topicId);
+  router.push({ name: "quiz" });
 };
 </script>
 
