@@ -1,6 +1,6 @@
 <template>
   <div class="result-container">
-    <h1>Bible Quiz - Result</h1>
+    <h1>Bible Quiz</h1>
     <p>
       👏 당신의 점수는 <strong>{{ score }}</strong> / {{ total }} 입니다.
     </p>
@@ -38,13 +38,12 @@ h1 {
   color: #4b3f72;
   font-family: "Georgia", serif;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 p {
   font-size: 1.5rem;
   color: #333;
-  margin-bottom: 2rem;
 }
 
 .restart-btn {

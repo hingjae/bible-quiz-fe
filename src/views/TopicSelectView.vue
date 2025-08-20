@@ -10,7 +10,7 @@
           v-for="topic in oldTestamentTopics"
           :key="topic.id"
           class="topic-btn old"
-          @click="goToQuiz(topic.id)"
+          @click="goToQuiz(topic)"
         >
           {{ topic.question || topic.bookTitle }}
         </button>
@@ -24,7 +24,7 @@
           v-for="topic in newTestamentTopics"
           :key="topic.id"
           class="topic-btn new"
-          @click="goToQuiz(topic.id)"
+          @click="goToQuiz(topic)"
         >
           {{ topic.question || topic.bookTitle }}
         </button>
@@ -54,8 +54,9 @@ onMounted(async () => {
 const oldTestamentTopics = computed(() => topics.value.filter((t) => t.testament === "OLD"));
 const newTestamentTopics = computed(() => topics.value.filter((t) => t.testament === "NEW"));
 
-const goToQuiz = (topicId: number) => {
-  quizStore.setTopic(topicId);
+const goToQuiz = (topic: Topic) => {
+  const label = topic.question || topic.bookTitle;
+  quizStore.setTopic(topic.id, label);
   router.push({ name: "quiz" });
 };
 </script>

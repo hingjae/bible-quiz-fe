@@ -1,6 +1,6 @@
 <template>
   <div class="quiz-container">
-    <h1>Bible Quiz - Quiz</h1>
+    <h1>Bible Quiz - {{ quizStore.topicLabel }}</h1>
 
     <div v-for="(quiz, index) in quizzes" :key="quiz.id" class="quiz-block">
       <h2>Q{{ index + 1 }}. {{ quiz.question }}</h2>
