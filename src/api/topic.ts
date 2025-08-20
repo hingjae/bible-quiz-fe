@@ -9,7 +9,7 @@ export interface Topic {
 
 export const fetchTopics = async () => {
   try {
-    const response = await apiClient.get("/api/topics");
+    const response = await apiClient.get("/api/daily-topics");
 
     return response.data.data.topics;
   } catch (error) {
