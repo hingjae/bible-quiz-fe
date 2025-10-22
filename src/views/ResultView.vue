@@ -4,7 +4,10 @@
     <p>
       👏 당신의 점수는 <strong>{{ score }}</strong> / {{ total }} 입니다.
     </p>
-    <button class="restart-btn" @click="goHome">처음으로 돌아가기</button>
+    <div class="button-group">
+      <button class="restart-btn" @click="goHome">처음으로 돌아가기</button>
+      <!-- <button class="ranking-btn" @click="goRanking">랭킹 등록하기</button> -->
+    </div>
   </div>
 </template>
 
@@ -19,6 +22,13 @@ const total = (window.history.state?.total as number) ?? 0;
 const goHome = () => {
   router.push("/");
 };
+
+// const goRanking = () => {
+//   router.push({
+//     path: "/ranking",
+//     state: { score, total },
+//   });
+// };
 </script>
 
 <style scoped>
@@ -46,18 +56,37 @@ p {
   color: #333;
 }
 
-.restart-btn {
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.restart-btn,
+.ranking-btn {
   padding: 0.8rem 2rem;
   font-size: 1.2rem;
-  background-color: #6b4eff;
-  color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
+.restart-btn {
+  background-color: #6b4eff;
+  color: #fff;
+}
+
 .restart-btn:hover {
   background-color: #5a3edf;
+}
+
+.ranking-btn {
+  background-color: #ff7b54;
+  color: #fff;
+}
+
+.ranking-btn:hover {
+  background-color: #e0673f;
 }
 </style>
