@@ -1,41 +1,100 @@
 <template>
-  <div class="quiz-container">
-    <h1>Bible Quiz - {{ quizStore.topicLabel }}</h1>
+  <n-space
+    vertical
+    :size="32"
+    style="max-width: 800px; margin: 0 auto; padding: 2rem; min-height: 100vh"
+  >
+    <!-- 제목 -->
+    <n-space vertical align="center" :size="12">
+      <n-h1 style="margin: 0; font-family: Georgia, serif; text-align: center">
+        <n-gradient-text type="info"> Bible Quiz </n-gradient-text>
+      </n-h1>
+      <n-tag type="info" size="large" round>
+        {{ quizStore.topicLabel }}
+      </n-tag>
+    </n-space>
 
-    <div v-for="(quiz, index) in quizzes" :key="quiz.id" class="quiz-block">
-      <h2>Q{{ index + 1 }}. {{ quiz.question }}</h2>
-      <ul>
-        <li
-          v-for="(option, optionIndex) in quiz.options"
-          :key="option"
-          :class="getOptionClass(quiz, option)"
-          @click="!isSubmitted && selectAnswer(quiz.id, option)"
-        >
-          <span class="option-number">{{ getOptionLabel(optionIndex) }}</span>
-          {{ option }}
-        </li>
-      </ul>
-      <div v-if="isSubmitted" class="answer-comment">
-        <span v-if="isCorrect(quiz)"
-          >✅ 정답입니다! <strong>{{ quiz.correctAnswer }}</strong></span
-        >
-        <span v-else
-          >❌ 오답입니다. 정답은
-          <strong
-            >{{ quiz.correctAnswer }}.{{ quiz.options[Number(quiz.correctAnswer) - 1] }}</strong
+    <!-- 점수 (제출 후) -->
+    <n-statistic v-if="isSubmitted" label="점수" :value="correctCount" style="text-align: center">
+      <template #suffix>/ {{ quizzes.length }}</template>
+    </n-statistic>
+
+    <!-- 퀴즈 목록 -->
+    <n-space vertical :size="24">
+      <n-card
+        v-for="(quiz, index) in quizzes"
+        :key="quiz.id"
+        :bordered="false"
+        hoverable
+        style="border-radius: 12px"
+      >
+        <!-- 질문 -->
+        <n-h3 style="margin: 0 0 1rem 0"> Q{{ index + 1 }}. {{ quiz.question }} </n-h3>
+
+        <!-- 선택지 -->
+        <n-space vertical :size="8">
+          <n-button
+            v-for="(option, optionIndex) in quiz.options"
+            :key="option"
+            block
+            :type="getOptionType(quiz, option)"
+            :disabled="isSubmitted"
+            :secondary="!isSubmitted && answers[quiz.id] !== option"
+            size="large"
+            @click="!isSubmitted && selectAnswer(quiz.id, option)"
+            style="justify-content: flex-start; text-align: left; height: auto; padding: 1rem"
           >
-        </span>
+            <span style="margin-right: 0.5rem; font-weight: bold">
+              {{ getOptionLabel(optionIndex) }}
+            </span>
+            {{ option }}
+          </n-button>
+        </n-space>
 
-        <div class="reason">💡 정답 해설: {{ quiz.correctAnswerReason }}</div>
-      </div>
-    </div>
+        <!-- 정답 해설 (제출 후) -->
+        <n-alert
+          v-if="isSubmitted"
+          :type="isCorrect(quiz) ? 'success' : 'error'"
+          style="margin-top: 1rem"
+        >
+          <template #header>
+            <span v-if="isCorrect(quiz)">
+              ✅ 정답입니다! <strong>{{ quiz.correctAnswer }}</strong>
+            </span>
+            <span v-else>
+              ❌ 오답입니다. 정답은
+              <strong>
+                {{ quiz.correctAnswer }}.
+                {{ quiz.options[Number(quiz.correctAnswer) - 1] }}
+              </strong>
+            </span>
+          </template>
+          <n-text depth="3">💡 {{ quiz.correctAnswerReason }}</n-text>
+        </n-alert>
+      </n-card>
+    </n-space>
 
-    <button v-if="!isSubmitted && quizzes.length > 0" class="submit-btn" @click="submitQuiz">
-      채점하기
-    </button>
+    <!-- 채점하기 버튼 -->
+    <n-button
+      v-if="!isSubmitted && quizzes.length > 0"
+      type="primary"
+      size="large"
+      block
+      strong
+      :disabled="Object.keys(answers).length !== quizzes.length"
+      @click="submitQuiz"
+    >
+      <template v-if="Object.keys(answers).length === quizzes.length"> 채점하기 ✅ </template>
+      <template v-else>
+        모든 문제를 풀어주세요 ({{ Object.keys(answers).length }}/{{ quizzes.length }})
+      </template>
+    </n-button>
 
-    <button v-if="isSubmitted" class="result-btn" @click="goToResult">결과 페이지로 가기</button>
-  </div>
+    <!-- 결과 페이지로 가기 버튼 -->
+    <n-button v-if="isSubmitted" type="success" size="large" block strong @click="goToResult">
+      결과 페이지로 가기 🎉
+    </n-button>
+  </n-space>
 </template>
 
 <script setup lang="ts">
@@ -78,29 +137,29 @@ const getOptionLabel = (index: number): string => {
   return `${index + 1}.`;
 };
 
-const selectAnswer = (quizId: number, option: string) => {
+const selectAnswer = (quizId: number, option: string): void => {
   if (isSubmitted.value) return;
   answers.value[quizId] = option;
 };
 
-const isCorrect = (quiz: Quiz) => {
+const isCorrect = (quiz: Quiz): boolean => {
   return answers.value[quiz.id] === quiz.correctAnswer;
 };
 
-const getOptionClass = (quiz: Quiz, optionText: string) => {
+const getOptionType = (quiz: Quiz, optionText: string): string => {
   const selected = answers.value[quiz.id];
   const correct = quiz.correctAnswer;
 
   if (!isSubmitted.value) {
-    return selected === optionText ? "selected" : "";
+    return selected === optionText ? "primary" : "default";
   } else {
-    if (optionText === correct) return "correct";
-    if (selected === optionText) return "wrong";
-    return "";
+    if (optionText === correct) return "success";
+    if (selected === optionText) return "error";
+    return "default";
   }
 };
 
-const submitQuiz = () => {
+const submitQuiz = (): void => {
   correctCount.value = 0;
   quizzes.value.forEach((q) => {
     if (answers.value[q.id] === q.correctAnswer) {
@@ -110,7 +169,7 @@ const submitQuiz = () => {
   isSubmitted.value = true;
 };
 
-const goToResult = () => {
+const goToResult = (): void => {
   router.push({
     name: "result",
     state: {
@@ -120,156 +179,3 @@ const goToResult = () => {
   });
 };
 </script>
-
-<style scoped>
-h1 {
-  font-size: 2.8rem;
-  font-weight: bold;
-  color: #3b2f78;
-  margin-bottom: 2rem;
-  font-family: "Georgia", serif;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.quiz-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.quiz-block {
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #ddd;
-  background: #fff;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.quiz-block h2 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: #222;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: flex;
-  align-items: center;
-  background-color: #f3f4f6;
-  margin: 0.5rem 0;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-}
-
-li:hover {
-  background-color: #e0e7ff;
-}
-
-li.selected {
-  background-color: #6b4eff;
-  color: white;
-}
-li.selected .option-number {
-  color: white;
-}
-
-li.correct {
-  background-color: #4caf50;
-  color: white;
-  font-weight: bold;
-}
-li.correct .option-number {
-  color: white;
-}
-
-li.wrong {
-  background-color: #f44336;
-  color: white;
-  font-weight: bold;
-}
-li.wrong .option-number {
-  color: white;
-}
-
-.option-number {
-  margin-right: 0.5rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.submit-btn {
-  display: block;
-  margin: 2rem auto;
-  padding: 0.6rem 2rem;
-  font-size: 1rem;
-  background-color: #6b4eff;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.submit-btn:hover {
-  background-color: #5a3edf;
-}
-
-.submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.answer-comment {
-  margin-top: 0.75rem;
-  padding: 0.5rem 0;
-  font-size: 0.95rem;
-  color: #333;
-  border-top: 1px solid #e0e0e0;
-}
-
-.reference {
-  margin-top: 5px;
-  font-size: 0.85rem;
-  color: #555;
-  font-style: italic;
-}
-
-.result-btn {
-  display: block;
-  margin: 2rem auto;
-  padding: 0.8rem 2rem;
-  font-size: 1.2rem;
-  background-color: #4caf50;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.result-btn:hover {
-  background-color: #43a047;
-}
-
-.reason {
-  margin-top: 5px;
-  font-size: 0.9rem;
-  color: #444;
-  background-color: #f9f9f9;
-  padding: 0.5rem 0.75rem;
-  border-left: 4px solid #6b4eff;
-  border-radius: 4px;
-}
-</style>
