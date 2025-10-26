@@ -7,7 +7,7 @@ export interface Topic {
   testament: "OLD" | "NEW";
 }
 
-export const fetchTopics = async () => {
+export const fetchTopics = async (): Promise<Topic[]> => {
   try {
     const response = await apiClient.get("/api/daily-topics");
 
